@@ -17,5 +17,6 @@ def main():
 	nodeValues = range(n)
 	random.shuffle(nodeValues)
 	x = hypercube.HyperCube(d, nodeValues)
+	print x.toDot()
 	
 main()

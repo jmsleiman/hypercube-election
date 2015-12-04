@@ -15,6 +15,7 @@ class HyperCube(object):
 		self.dimension = dimension
 		self.listOfNodes = []
 		self.messageRegistry = []
+		self.dotString = ""
 		
 		###                                   do some setting up
 		###     add in those values as nodes
@@ -55,17 +56,20 @@ class HyperCube(object):
 		if(len(entry) == 2):
 			entry[0].attach(entry[1], 1)
 			entry[1].attach(entry[0], 1)
-		
+	
 	def toDot(self):
-		text = "digraph {\n\tlayout = circo"
+		text = "digraph {\n\tlayout = circo\n"
 		for entry in self.listOfNodes:
-			text = text + "\t" + entry.toDot() + "\n"
-		text = text + "subgraph Undirected {"
-		# now we need to draw all the connections...
-		text = text + "}\n" + "subgraph Directed {"
+			text = text + entry.toDot()
+			
+		text = text + "}"
+		self.dotString = text
+		return self.dotString
 		# now we need to draw all the leader directions...
 		# woohoo...
 		
+		
+	
 def split_list(a_list):
 	half = len(a_list)/2
 	return a_list[:half], a_list[half:]
