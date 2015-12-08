@@ -8,6 +8,9 @@
 
 import math
 import node
+import structlog
+
+log = structlog.get_logger()
 
 class HyperCube(object):
 	def __init__(self, dimension, nodeValues):
@@ -25,8 +28,6 @@ class HyperCube(object):
 		
 		self.setConnections(self.listOfNodes)
 		
-		for entry in self.listOfNodes:
-			print str(entry)
 		
 	def setConnections(self, entry):
 		'''this method splits the list of entries into smaller and
@@ -57,6 +58,73 @@ class HyperCube(object):
 			entry[0].attach(entry[1], 1)
 			entry[1].attach(entry[0], 1)
 	
+	def electSmallest(self):
+		'''
+		In this scenario, the nodes must find the smallest node among them, and name it their leader.
+		Strategy:
+			- Each node must message its neighbour on the i edge:
+				message contains:
+					rank
+					value
+			- When an active node receives a message:
+				- If the message received is from a smaller rank, there's been a catastrophic bug.
+				- If the message received is from an equal rank:
+					- If the receiver has a higher value, it increments its rank
+					- If the receiver has a lower value, it points the master variable to the edge that sent the message, and goes dormant
+				- If the message received is from a higher rank:
+					- The node pushes it to a queue and comes back to it when it's ready (ie when the rank matches)
+			- When a passive node receives a message:
+				- If the message contains a rank lower than the rank of your master, switch alliances
+		'''
+		
+		messageMatrix = []
+		
+		for node in self.listOfNodes:
+			messageMatrix.append(node.createChallenge(0))
+		
+		clock = 0
+		victor = None
+		dots = []
+		
+		while(victor == None):
+			dots.append(self.toDot())
+			clock = clock + 1
+			messagesToProcess = []
+			messagesToQueue = []
+			
+			while( len(messageMatrix) > 0):
+				if(messageMatrix[0].delay <= 0):
+					messagesToProcess.append(messageMatrix.pop(0))
+				else:
+					messagesToQueue.append(messageMatrix.pop(0))
+			
+			# now it's time to process messages
+			while(len(messagesToProcess) > 0):
+				msg = messagesToProcess.pop(0)
+				
+				# however, how do we account for a redirected challenge?
+				# and how do we account for a success, defeat?
+				toBeContinued = msg.destination.processMessage(msg, False)
+				if(toBeContinued != None):
+					messageMatrix.append(toBeContinued)
+				
+				
+			# now it's time to requeue those messages
+			for msg in messagesToQueue:
+				messageMatrix.append(msg)
+			
+			for msg in messageMatrix:
+				msg.delay -= 1
+			
+			for node in self.listOfNodes:
+				if node.rank == self.dimension:
+					print "Winner! {0}".format(node)
+					victor = node
+					break
+			
+		
+		return dots
+	
 	def toDot(self):
 		text = "digraph {\n\tlayout = circo\n"
 		for entry in self.listOfNodes:
@@ -67,7 +135,6 @@ class HyperCube(object):
 		return self.dotString
 		# now we need to draw all the leader directions...
 		# woohoo...
-		
 		
 	
 def split_list(a_list):
