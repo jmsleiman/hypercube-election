@@ -8,9 +8,6 @@
 
 import math
 import node
-import structlog
-
-log = structlog.get_logger()
 
 class HyperCube(object):
 	def __init__(self, dimension, nodeValues):
@@ -42,7 +39,6 @@ class HyperCube(object):
 		
 		0 and 4, 1 and 5, 2 and 6, 3 and 7 all form connections together
 		in dimension 3 (as this list has 8 elements, 2^3 = 8...)
-		a convenient coincidence... ;)
 		'''
 		
 		if(len(entry) > 2):
@@ -58,6 +54,7 @@ class HyperCube(object):
 			entry[0].attach(entry[1], 1)
 			entry[1].attach(entry[0], 1)
 	
+	# @profile
 	def election(self, largestWins):
 		'''
 		In this scenario, the nodes must find the smallest node among them, and name it their leader.
@@ -70,11 +67,11 @@ class HyperCube(object):
 				- If the message received is from a smaller rank, there's been a catastrophic bug.
 				- If the message received is from an equal rank:
 					- If the receiver has a higher value, it increments its rank
-					- If the receiver has a lower value, it points the master variable to the edge that sent the message, and goes dormant
+					- If the receiver has a lower value, it points the queen variable to the edge that sent the message, and goes dormant
 				- If the message received is from a higher rank:
 					- The node pushes it to a queue and comes back to it when it's ready (ie when the rank matches)
 			- When a passive node receives a message:
-				- If the message contains a rank lower than the rank of your master, switch alliances
+				- If the message contains a rank lower than the rank of your queen, switch alliances
 		'''
 		
 		messageMatrix = []
@@ -87,16 +84,19 @@ class HyperCube(object):
 		dots = []
 		
 		while(victor == None):
-			dots.append(self.toDot())
+			dot = self.toDot()[:-1]
+			
 			clock = clock + 1
 			messagesToProcess = []
 			messagesToQueue = []
 			
 			while( len(messageMatrix) > 0):
-				if(messageMatrix[0].delay <= 0):
-					messagesToProcess.append(messageMatrix.pop(0))
+				msg = messageMatrix.pop(0)
+				dot += msg.toDot()
+				if(msg.delay <= 0):
+					messagesToProcess.append(msg)
 				else:
-					messagesToQueue.append(messageMatrix.pop(0))
+					messagesToQueue.append(msg)
 			
 			# now it's time to process messages
 			while(len(messagesToProcess) > 0):
@@ -116,13 +116,17 @@ class HyperCube(object):
 			for msg in messageMatrix:
 				msg.delay -= 1
 			
+			dot += "}"
+			dots.append(dot)
+			
 			for node in self.listOfNodes:
 				if node.rank == self.dimension:
 					print "Winner! {0}".format(node)
 					victor = node
 					break
 			
-		
+		dot = self.toDot()
+		dots.append(dot)
 		return dots
 	
 	def toDot(self):
