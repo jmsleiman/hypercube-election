@@ -49,13 +49,13 @@ It's of course possible to modify the code to only print the last graph, but the
 ### How to use it
 
 Run the main file:
-
+```
 $ python main.py x high
-
+```
 or
-
+```
 $ python main.py x low
-
+```
 Where x is the dimension of the hypercube to be simulated, and the choice of high/low indicates the direction of the results to present.
 
 The end result is a folder filled with dot files, which can be compiled to show the progress of the election at each "clock tick".
