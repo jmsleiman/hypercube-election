@@ -52,5 +52,6 @@ if __name__ == "__main__":
 		else:
 			raise Exception("Election choice invalid")
 	
-	except ValueError:
+	except ValueError as e:
+		print e
 		print "usage: main.py [int: dimension of the hypercube] [high/low: elect highest/lowest]"
