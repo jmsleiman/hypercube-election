@@ -58,7 +58,7 @@ class HyperCube(object):
 			entry[0].attach(entry[1], 1)
 			entry[1].attach(entry[0], 1)
 	
-	def electSmallest(self):
+	def election(self, largestWins):
 		'''
 		In this scenario, the nodes must find the smallest node among them, and name it their leader.
 		Strategy:
@@ -104,7 +104,7 @@ class HyperCube(object):
 				
 				# however, how do we account for a redirected challenge?
 				# and how do we account for a success, defeat?
-				toBeContinued = msg.destination.processMessage(msg, False)
+				toBeContinued = msg.destination.processMessage(msg, largestWins)
 				if(toBeContinued != None):
 					messageMatrix.append(toBeContinued)
 				

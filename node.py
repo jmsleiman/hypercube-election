@@ -7,6 +7,7 @@
 # modify it under the terms of the LGPLv2.1 or LGPLv3 License.
 
 import structlog
+import random
 
 log = structlog.get_logger()
 
@@ -15,7 +16,7 @@ class Node(object):
 		self.value = value
 		self.rank = 0
 		self.connections = [None]*dimension
-		self.connectionsDelay = [1]*dimension
+		self.connectionsDelay = [random.randint(0,9)]*dimension
 		self.dotLabel = self.value
 		self.dotString = ""
 		self.master = None
