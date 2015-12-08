@@ -10,6 +10,7 @@ import random
 import math
 import os.path
 import time
+import sys
 
 import node
 import hypercube
@@ -18,7 +19,12 @@ import hypercube
 # ls | xargs -I {} dot -Tpng {} -o {}.png
 
 def main():
-	d = 4
+	try:
+		d = int(sys.argv[1])
+	except Exception:
+		print "usage: main.py [dimension of the hypercube]"
+		return 
+	
 	n = pow(2, d)
 	nodeValues = range(n)
 	random.shuffle(nodeValues)
