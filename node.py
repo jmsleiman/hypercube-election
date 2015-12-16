@@ -126,7 +126,7 @@ class Message(object):
 		self.delay = delay
 	
 	def toDot(self):
-		return '\t\t{0} -> {1} [color="black", style=dashed]\n'.format(self.source.dotLabel, self.destination.dotLabel)
+		return '\t\t{0} -> {1} [color="black", style=dashed, label="{2}"]\n'.format(self.source.dotLabel, self.destination.dotLabel, self.delay)
 	
 	def __str__(self):
 		return "<Source: [{0}]\tDestination: [{1}]\tRank: {2}\tValue: {3}\tDelay: {4}>".format(self.source.value, self.destination.value, self.rank, self.value, self.delay)
